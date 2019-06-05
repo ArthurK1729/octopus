@@ -109,13 +109,15 @@ func main() {
 
 	log.Println("Loading vertices")
 	vertexStore[1] = &Vertex{vertexID: 1, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{2}}
-	vertexStore[2] = &Vertex{vertexID: 2, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{3}}
+	vertexStore[2] = &Vertex{vertexID: 2, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{3, 4}}
 	vertexStore[3] = &Vertex{vertexID: 3, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{}}
+	vertexStore[4] = &Vertex{vertexID: 4, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{3, 5}}
+	vertexStore[5] = &Vertex{vertexID: 5, state: VertexState{shortestPathSize: math.MaxUint32}, outNeighbourIds: []uint32{}}
 
 	log.Println("Seed sent")
 	inboxChannel <- Envelope{destinationVertexID: 1, message: Message{candidateShortestPath: 0}}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 20; i++ {
 		wg.Add(1)
 		go inboxWorker(vertexStore, inboxChannel)
 		wg.Wait()
