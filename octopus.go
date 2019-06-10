@@ -164,6 +164,8 @@ func countUnvisited(vertexStore map[uint32]*Vertex) {
 // read lines one by one and ship them to other nodes once buffer limit is reached.
 // voteToHalt might not be threadsafe
 // Verify results with single source shortest path in NetworkX
+// Split into packages
+// What do I do with nodes from other connected components that will never be touched? Their voteToHalt will remain false.
 var wg sync.WaitGroup
 
 func main() {
@@ -178,7 +180,7 @@ func main() {
 
 	log.Println("Sending seed")
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		outboxChannel = make(chan Envelope, 100000)
 
 		if i == 0 {
@@ -208,4 +210,5 @@ func main() {
 
 	displayFinalResults(vertexStore)
 	countUnvisited(vertexStore)
+	log.Println(vertexStore[42])
 }
