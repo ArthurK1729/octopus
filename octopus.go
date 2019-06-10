@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Envelope struct {
@@ -56,15 +55,12 @@ func (v *Vertex) broadcast(outboxChannel chan Envelope) {
 func inboxWorker(vertexStore map[uint32]*Vertex, inboxChannel chan Envelope) {
 	log.Println("Inbox worker spawned")
 	defer wg.Done()
-	select {
-	case envelope := <-inboxChannel:
+
+	for envelope := range inboxChannel {
 		log.Println("Processing message for", envelope.destinationVertexID)
 		v := vertexStore[envelope.destinationVertexID]
 		v.compute(envelope.message)
 		log.Println("State of", envelope.destinationVertexID, "now is", v.state)
-	case <-time.After(1 * time.Second):
-		log.Println("WORKER TIMED OUT")
-		return
 	}
 }
 
@@ -86,14 +82,14 @@ func outboxWorker(vertexStore map[uint32]*Vertex, outboxChannel chan Envelope, i
 		}
 	}
 
-	select {
-	case envelope := <-outboxChannel:
+	close(outboxChannel)
+
+	for envelope := range outboxChannel {
 		log.Println(envelope, "sent to inboxChannel")
 		inboxChannel <- envelope
-	case <-time.After(2 * time.Second):
-		log.Println("OUTBOX WORKER TIMED OUT")
-		return
 	}
+
+	close(inboxChannel)
 }
 
 func displayFinalResults(vertexStore map[uint32]*Vertex) {
@@ -101,23 +97,6 @@ func displayFinalResults(vertexStore map[uint32]*Vertex) {
 		log.Println("ID:", v.vertexID, "STATE:", v.state)
 	}
 }
-
-// func readAdjlist(vertexStore map[uint32]*Vertex, path string) {
-// 	file, err := os.Open(path)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer file.Close()
-
-// 	scanner := bufio.NewScanner(file)
-// 	for scanner.Scan() {
-// 		fmt.Println(scanner.Text())
-// 	}
-
-// 	if err := scanner.Err(); err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
 
 // Reads in an adjlist and populates vertexStore
 func readAdjlist(vertexStore map[uint32]*Vertex, path string) (err error) {
@@ -190,20 +169,39 @@ var wg sync.WaitGroup
 func main() {
 	log.Println("Initializing")
 	var vertexStore = make(map[uint32]*Vertex)
-	var inboxChannel = make(chan Envelope, 100000)
-	var outboxChannel = make(chan Envelope, 100000)
+	var inboxChannel chan Envelope
+	var outboxChannel chan Envelope
 
 	log.Println("Ingesting vertices")
 	readAdjlist(vertexStore, "facebook_social_graph.adjlist")
 	// readAdjlist(vertexStore, "graph.adjlist")
 
 	log.Println("Sending seed")
-	inboxChannel <- Envelope{destinationVertexID: 0, message: Message{candidateShortestPath: 0}}
 
-	for i := 0; i < 4*len(vertexStore); i++ {
+	for i := 0; i < 5; i++ {
+		outboxChannel = make(chan Envelope, 100000)
+
+		if i == 0 {
+			inboxChannel = make(chan Envelope, 100000)
+			inboxChannel <- Envelope{destinationVertexID: 0, message: Message{candidateShortestPath: 0}}
+			close(inboxChannel)
+		}
+
+		wg.Add(1)
+		go inboxWorker(vertexStore, inboxChannel)
+		wg.Add(1)
+		go inboxWorker(vertexStore, inboxChannel)
+		wg.Add(1)
+		go inboxWorker(vertexStore, inboxChannel)
+		wg.Add(1)
+		go inboxWorker(vertexStore, inboxChannel)
+		wg.Add(1)
+		go inboxWorker(vertexStore, inboxChannel)
 		wg.Add(1)
 		go inboxWorker(vertexStore, inboxChannel)
 		wg.Wait()
+
+		inboxChannel = make(chan Envelope, 100000)
 		outboxWorker(vertexStore, outboxChannel, inboxChannel)
 		log.Println("ROUND OVER")
 	}
