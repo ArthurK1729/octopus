@@ -15,7 +15,7 @@ func slaveProcess() {
 	var outboxChannel chan Envelope
 
 	log.Println("Ingesting vertices")
-	vertexStore, err := ReadAdjlist("facebook_social_graph.adjlist")
+	vertexStore, err := ReadAdjlist("data/facebook_social_graph.adjlist")
 
 	if err != nil {
 		log.Println("Couldn't read in graph. Exiting")
@@ -66,8 +66,9 @@ var wg sync.WaitGroup
 // What do I do with nodes from other connected components that will never be touched? Their voteToHalt will remain false.
 // https://www.youtube.com/watch?v=YEKjSzIwAdA try select default too?
 func main() {
-	modePtr := flag.String("mode", "master", "specifies whether to run in master or slave mode")
+	modePtr := flag.String("mode", "master", "master or slave run mode")
 
+	log.Println(*modePtr)
 	flag.Parse()
 	if *modePtr == "slave" {
 		slaveProcess()
