@@ -65,6 +65,7 @@ var wg sync.WaitGroup
 // Verify results with single source shortest path in NetworkX
 // What do I do with nodes from other connected components that will never be touched? Their voteToHalt will remain false.
 // https://www.youtube.com/watch?v=YEKjSzIwAdA try select default too?
+// Implement multi-algorithm message passing
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 
