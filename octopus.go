@@ -67,6 +67,7 @@ var wg sync.WaitGroup
 // https://www.youtube.com/watch?v=YEKjSzIwAdA try select default too?
 // Implement multi-algorithm message passing
 // Use a ring hash to distribute the vertices https://godoc.org/github.com/golang/groupcache/consistenthash
+// Implement gRPC
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 
