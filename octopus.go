@@ -68,6 +68,7 @@ var wg sync.WaitGroup
 // Implement multi-algorithm message passing
 // Use a ring hash to distribute the vertices https://godoc.org/github.com/golang/groupcache/consistenthash
 // Implement gRPC
+// Collect resulting vertexStore from each slave. Append all results to a local file
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 
