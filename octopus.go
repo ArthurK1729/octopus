@@ -11,11 +11,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-func slaveProcess() {
+func slaveProcess(port string) {
 	log.Println("Running in slave mode")
 
-	lis, err := net.Listen("tcp", slavePort)
-	log.Println("Listening to port", slavePort)
+	lis, err := net.Listen("tcp", ":"+port)
+	log.Println("Listening to port", ":"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -26,16 +26,35 @@ func slaveProcess() {
 }
 
 func masterProcess() {
-	address := "localhost" + slavePort
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	log.Println("Running in master mode")
+	// Start master server
+	lis, err := net.Listen("tcp", masterPort)
+	log.Println("Listening to port", masterPort)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	RegisterMasterServer(s, &masterserver{})
+	log.Println("Listening for slave requests...")
+	go s.Serve(lis)
+
+	// Connect to slaves
+	address1 := "localhost" + slavePort1
+	address2 := "localhost" + slavePort2
+	conn1, err := grpc.Dial(address1, grpc.WithInsecure())
+	conn2, err := grpc.Dial(address2, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
-	c := NewSlaveClient(conn)
+	defer conn1.Close()
+	defer conn2.Close()
+
+	c1 := NewSlaveClient(conn1)
+	c2 := NewSlaveClient(conn2)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
+	// Continue here. Enable distribution between slaves
 	defer cancel()
 	// Check heartbeat
 	go func() {
@@ -87,11 +106,12 @@ var wg sync.WaitGroup
 // Figure out how to make empty calls (remove &Empty{} throughout)
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
+	portPtr := flag.String("slavePort", "50051", "port for slave node")
 
 	log.Println(*modePtr)
 	flag.Parse()
 	if *modePtr == "slave" {
-		slaveProcess()
+		slaveProcess(*portPtr)
 	} else if *modePtr == "master" {
 		masterProcess()
 	}

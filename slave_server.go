@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	slavePort = ":50052"
+	slavePort1 = ":50052"
+	slavePort2 = ":50053"
 )
 
 type slaveserver struct {

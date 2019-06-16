@@ -1,17 +1,17 @@
 package main
 
-// import (
-// 	"context"
-// 	"time"
-// )
+import (
+	"context"
+)
 
-// const (
-// 	port = ":50051"
-// )
+const (
+	masterPort = ":50051"
+)
 
-// type MasterServer struct{}
+type masterserver struct {
+	vertexSlaveRegistry VertexSlaveRegistry
+}
 
-// func (s *MasterServer) GetHeartbeat(ctx context.Context) (Heartbeat, error) {
-// 	now := time.Now().Unix()
-// 	return Heartbeat{Timestamp: now}, nil
-// }
+func (s *masterserver) GetVertexSlaveRegistry(ctx context.Context, empty *Empty) (*VertexSlaveRegistry, error) {
+	return &s.vertexSlaveRegistry, nil
+}
