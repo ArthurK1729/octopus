@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package main;
+
+service Master {
+  rpc GetVertexSlaveRegistry(Empty) returns (VertexSlaveRegistry) {}
+}
+
+message VertexSlaveRegistry {
+    map<uint32, string> registry = 1;
+}
+
+message Empty {
+}

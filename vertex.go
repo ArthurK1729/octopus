@@ -2,45 +2,47 @@ package main
 
 import "log"
 
-type Envelope struct {
-	message             Message
-	destinationVertexID uint32
-}
+// // Envelope contains the destination vertex id and the message it needs to process
+// type Envelope struct {
+// 	message             Message
+// 	destinationVertexID uint32
+// }
 
-type Message struct {
-	candidateShortestPath uint32
-}
+// // Message contains the data that must be supplied into Compute
+// type Message struct {
+// 	candidateShortestPath uint32
+// }
 
-type VertexState struct {
-	shortestPathSize uint32
-}
+// // VertexState is the current state of a vertex
+// type VertexState struct {
+// 	shortestPathSize uint32
+// }
 
-type Vertex struct {
-	vertexID        uint32
-	state           VertexState
-	active          bool
-	outNeighbourIds []uint32
-	voteToHalt      bool
-}
+// type Vertex struct {
+// 	vertexID        uint32
+// 	state           VertexState
+// 	outNeighbourIds []uint32
+// 	voteToHalt      bool
+// }
 
 func (v *Vertex) Compute(message Message) {
-	if v.state.shortestPathSize > message.candidateShortestPath {
-		v.state.shortestPathSize = message.candidateShortestPath
+	if v.State.ShortestPathSize > message.CandidateShortestPath {
+		v.State.ShortestPathSize = message.CandidateShortestPath
 
 		// If a vertex has updated its state, it will want to broadcast it
-		v.voteToHalt = false
+		v.VoteToHalt = false
 	}
 }
 
 func (v *Vertex) Broadcast(outboxChannel chan Envelope) {
-	log.Println("Broadcasting for", v.vertexID)
+	log.Println("Broadcasting for", v.VertexID)
 
-	for _, nbdID := range v.outNeighbourIds {
-		newState := v.state.shortestPathSize + 1
-		outboxChannel <- Envelope{destinationVertexID: nbdID, message: Message{candidateShortestPath: newState}}
+	for _, nbdID := range v.OutNeighbourIds {
+		newState := v.State.ShortestPathSize + 1
+		outboxChannel <- Envelope{DestinationVertexID: nbdID, Message: &Message{CandidateShortestPath: newState}}
 
 		// As soon as the vertex has broadcasted its new state, it will want to stop
-		v.voteToHalt = true
+		v.VoteToHalt = true
 	}
 
 }

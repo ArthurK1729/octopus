@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+
+import "master_data.proto";
+
+package main;
+
+// Possibly convert into a stream of Envelopes -> then feed it directly into the inboxChannel one by one
+service Slave {
+  rpc GetHeartbeat(Empty) returns (Heartbeat) {}
+  rpc LoadGraphPartition(Vertices) returns (Empty) {}
+  rpc InitiateExecution(Empty) returns (Empty) {}
+}
+
+// Change below to timestamp
+message Heartbeat {
+    int64 timestamp = 1;
+}
+
+message Envelopes {
+    repeated Envelope envelope = 1;
+}
+
+message Envelope {
+    uint32 destinationVertexID = 1;
+    Message message = 2;
+}
+
+message Message {
+    uint32 candidateShortestPath = 1;
+}
+
+message Vertices {
+    repeated Vertex vertices = 1;
+}
+
+message Vertex {
+    uint32 vertexID = 1;
+    VertexState state = 2;
+    repeated uint32 outNeighbourIds = 3;
+    bool voteToHalt = 4;
+}
+
+message VertexState {
+    uint32 shortestPathSize = 1;
+}

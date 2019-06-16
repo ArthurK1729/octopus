@@ -1,59 +1,75 @@
 package main
 
 import (
+	context "context"
 	"flag"
 	"log"
+	"net"
 	"sync"
+	"time"
+
+	"google.golang.org/grpc"
 )
 
 func slaveProcess() {
 	log.Println("Running in slave mode")
 
-	log.Println("Initializing slave")
-	var vertexStore map[uint32]*Vertex
-	var inboxChannel chan Envelope
-	var outboxChannel chan Envelope
+	lis, err := net.Listen("tcp", slavePort)
+	log.Println("Listening to port", slavePort)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	RegisterSlaveServer(s, &slaveserver{})
+	log.Println("Waiting for master...")
+	s.Serve(lis)
+}
+
+func masterProcess() {
+	address := "localhost" + slavePort
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := NewSlaveClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+
+	defer cancel()
+	// Check heartbeat
+	go func() {
+		for {
+			r, err := c.GetHeartbeat(ctx, &Empty{})
+			if err != nil {
+				log.Fatalf("Could not get heartbeat: %v", err)
+			}
+			log.Printf("Got heartbeat: %s", r.Timestamp)
+			time.Sleep(time.Second)
+		}
+	}()
 
 	log.Println("Ingesting vertices")
-	vertexStore, err := ReadAdjlist("data/facebook_social_graph.adjlist")
+	vertices, err := ReadAdjlist("data/facebook_social_graph.adjlist")
 
 	if err != nil {
 		log.Println("Couldn't read in graph. Exiting")
 		panic("Couldn't read in graph")
 	}
 
-	log.Println("Sending seed")
+	vertexShipment := []*Vertex{}
 
-	for i := 0; i < 20; i++ {
-		outboxChannel = make(chan Envelope, 100000)
-
-		if i == 0 {
-			inboxChannel = make(chan Envelope, 100000)
-			inboxChannel <- Envelope{destinationVertexID: 0, message: Message{candidateShortestPath: 0}}
-			close(inboxChannel)
-		}
-
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Add(1)
-		go InboxWorker(vertexStore, inboxChannel)
-		wg.Wait()
-
-		inboxChannel = make(chan Envelope, 100000)
-		OutboxWorker(vertexStore, outboxChannel, inboxChannel)
-		log.Println("ROUND OVER")
+	for _, v := range vertices {
+		vertexShipment = append(vertexShipment, v)
 	}
 
-	DisplayFinalResults(vertexStore)
-	CountUnvisited(vertexStore)
+	c.LoadGraphPartition(ctx, &Vertices{Vertices: vertexShipment})
+	if err != nil {
+		log.Fatalf("Could not load graph partition: %v", err)
+	}
+	time.Sleep(5 * time.Second)
+	c.InitiateExecution(ctx, &Empty{})
+
 }
 
 var wg sync.WaitGroup
@@ -67,8 +83,8 @@ var wg sync.WaitGroup
 // https://www.youtube.com/watch?v=YEKjSzIwAdA try select default too?
 // Implement multi-algorithm message passing
 // Use a ring hash to distribute the vertices https://godoc.org/github.com/golang/groupcache/consistenthash
-// Implement gRPC
 // Collect resulting vertexStore from each slave. Append all results to a local file
+// Figure out how to make empty calls (remove &Empty{} throughout)
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 
@@ -77,7 +93,6 @@ func main() {
 	if *modePtr == "slave" {
 		slaveProcess()
 	} else if *modePtr == "master" {
-		// run masterProcess
+		masterProcess()
 	}
-
 }

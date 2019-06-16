@@ -44,10 +44,10 @@ func ReadAdjlist(path string) (map[uint32]*Vertex, error) {
 		}
 
 		vertexStore[uint32(originNode)] = &Vertex{
-			vertexID:        uint32(originNode),
-			state:           VertexState{shortestPathSize: math.MaxUint32},
-			outNeighbourIds: targetNodes,
-			voteToHalt:      false,
+			VertexID:        uint32(originNode),
+			State:           &VertexState{ShortestPathSize: math.MaxUint32},
+			OutNeighbourIds: targetNodes,
+			VoteToHalt:      false,
 		}
 
 	}

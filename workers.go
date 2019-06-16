@@ -10,17 +10,17 @@ func InboxWorker(vertexStore map[uint32]*Vertex, inboxChannel chan Envelope) {
 	defer wg.Done()
 
 	for envelope := range inboxChannel {
-		log.Println("Processing message for", envelope.destinationVertexID)
-		v := vertexStore[envelope.destinationVertexID]
-		v.Compute(envelope.message)
-		log.Println("State of", envelope.destinationVertexID, "now is", v.state)
+		log.Println("Processing message for", envelope.DestinationVertexID)
+		v := vertexStore[envelope.DestinationVertexID]
+		v.Compute(*envelope.Message)
+		log.Println("State of", envelope.DestinationVertexID, "now is", v.State)
 	}
 }
 
 func OutboxWorker(vertexStore map[uint32]*Vertex, outboxChannel chan Envelope, inboxChannel chan Envelope) {
 	log.Println("Executing outboxWorker")
 	for _, v := range vertexStore {
-		if v.state.shortestPathSize != math.MaxUint32 && v.voteToHalt == false {
+		if v.State.ShortestPathSize != math.MaxUint32 && v.VoteToHalt == false {
 			v.Broadcast(outboxChannel)
 		}
 	}
