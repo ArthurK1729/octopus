@@ -104,6 +104,7 @@ var wg sync.WaitGroup
 // Use a ring hash to distribute the vertices https://godoc.org/github.com/golang/groupcache/consistenthash
 // Collect resulting vertexStore from each slave. Append all results to a local file
 // Figure out how to make empty calls (remove &Empty{} throughout)
+// Add SlaveDelegate. Encapsulate all information for each slave (hostname, connection object, hash number) in a struct
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	portPtr := flag.String("slavePort", "50051", "port for slave node")
