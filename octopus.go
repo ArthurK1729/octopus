@@ -105,6 +105,8 @@ var wg sync.WaitGroup
 // Collect resulting vertexStore from each slave. Append all results to a local file
 // Figure out how to make empty calls (remove &Empty{} throughout)
 // Add SlaveDelegate. Encapsulate all information for each slave (hostname, connection object, hash number) in a struct
+// Implement Brandes algorithm for betweenness https://www.cl.cam.ac.uk/teaching/1617/MLRD/handbook/brandes.pdf
+// Implement Pagerank as described in original pregel paper
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	portPtr := flag.String("slavePort", "50051", "port for slave node")
