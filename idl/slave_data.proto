@@ -10,6 +10,7 @@ service Slave {
   rpc GetHeartbeat(Empty) returns (Heartbeat) {}
   rpc LoadGraphPartition(Vertices) returns (Empty) {}
   rpc InitiateExecution(Empty) returns (Empty) {}
+  rpc PopulateInbox(Envelopes) returns (Empty) {}
 }
 
 // Change below to timestamp

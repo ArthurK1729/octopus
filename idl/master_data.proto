@@ -4,6 +4,16 @@ package main;
 
 service Master {
   rpc GetVertexSlaveRegistry(Empty) returns (VertexSlaveRegistry) {}
+  rpc RegisterSlave(SlaveHost) returns (SlaveIdentifier) {}
+  rpc SlaveDone(SlaveIdentifier) returns (Empty) {}
+}
+
+message SlaveHost {
+  string slaveHost = 1;
+}
+
+message SlaveIdentifier {
+  uint32 slaveIdentifier = 1;
 }
 
 message VertexSlaveRegistry {

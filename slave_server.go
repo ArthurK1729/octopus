@@ -12,9 +12,10 @@ const (
 )
 
 type slaveserver struct {
-	vertexStore   map[uint32]*Vertex
-	inboxChannel  chan Envelope
-	outboxChannel chan Envelope
+	slaveIdentifier *SlaveIdentifier
+	vertexStore     map[uint32]*Vertex
+	inboxChannel    chan Envelope
+	outboxChannel   chan Envelope
 }
 
 func (s *slaveserver) GetHeartbeat(ctx context.Context, empty *Empty) (*Heartbeat, error) {

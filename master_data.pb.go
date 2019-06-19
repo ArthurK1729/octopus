@@ -24,6 +24,84 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type SlaveHost struct {
+	SlaveHost            string   `protobuf:"bytes,1,opt,name=slaveHost,proto3" json:"slaveHost,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SlaveHost) Reset()         { *m = SlaveHost{} }
+func (m *SlaveHost) String() string { return proto.CompactTextString(m) }
+func (*SlaveHost) ProtoMessage()    {}
+func (*SlaveHost) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ba343a99112eefe2, []int{0}
+}
+
+func (m *SlaveHost) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SlaveHost.Unmarshal(m, b)
+}
+func (m *SlaveHost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SlaveHost.Marshal(b, m, deterministic)
+}
+func (m *SlaveHost) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SlaveHost.Merge(m, src)
+}
+func (m *SlaveHost) XXX_Size() int {
+	return xxx_messageInfo_SlaveHost.Size(m)
+}
+func (m *SlaveHost) XXX_DiscardUnknown() {
+	xxx_messageInfo_SlaveHost.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SlaveHost proto.InternalMessageInfo
+
+func (m *SlaveHost) GetSlaveHost() string {
+	if m != nil {
+		return m.SlaveHost
+	}
+	return ""
+}
+
+type SlaveIdentifier struct {
+	SlaveIdentifier      uint32   `protobuf:"varint,1,opt,name=slaveIdentifier,proto3" json:"slaveIdentifier,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SlaveIdentifier) Reset()         { *m = SlaveIdentifier{} }
+func (m *SlaveIdentifier) String() string { return proto.CompactTextString(m) }
+func (*SlaveIdentifier) ProtoMessage()    {}
+func (*SlaveIdentifier) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ba343a99112eefe2, []int{1}
+}
+
+func (m *SlaveIdentifier) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SlaveIdentifier.Unmarshal(m, b)
+}
+func (m *SlaveIdentifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SlaveIdentifier.Marshal(b, m, deterministic)
+}
+func (m *SlaveIdentifier) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SlaveIdentifier.Merge(m, src)
+}
+func (m *SlaveIdentifier) XXX_Size() int {
+	return xxx_messageInfo_SlaveIdentifier.Size(m)
+}
+func (m *SlaveIdentifier) XXX_DiscardUnknown() {
+	xxx_messageInfo_SlaveIdentifier.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SlaveIdentifier proto.InternalMessageInfo
+
+func (m *SlaveIdentifier) GetSlaveIdentifier() uint32 {
+	if m != nil {
+		return m.SlaveIdentifier
+	}
+	return 0
+}
+
 type VertexSlaveRegistry struct {
 	Registry             map[uint32]string `protobuf:"bytes,1,rep,name=registry,proto3" json:"registry,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
@@ -35,7 +113,7 @@ func (m *VertexSlaveRegistry) Reset()         { *m = VertexSlaveRegistry{} }
 func (m *VertexSlaveRegistry) String() string { return proto.CompactTextString(m) }
 func (*VertexSlaveRegistry) ProtoMessage()    {}
 func (*VertexSlaveRegistry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ba343a99112eefe2, []int{0}
+	return fileDescriptor_ba343a99112eefe2, []int{2}
 }
 
 func (m *VertexSlaveRegistry) XXX_Unmarshal(b []byte) error {
@@ -73,7 +151,7 @@ func (m *Empty) Reset()         { *m = Empty{} }
 func (m *Empty) String() string { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()    {}
 func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ba343a99112eefe2, []int{1}
+	return fileDescriptor_ba343a99112eefe2, []int{3}
 }
 
 func (m *Empty) XXX_Unmarshal(b []byte) error {
@@ -95,6 +173,8 @@ func (m *Empty) XXX_DiscardUnknown() {
 var xxx_messageInfo_Empty proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*SlaveHost)(nil), "main.SlaveHost")
+	proto.RegisterType((*SlaveIdentifier)(nil), "main.SlaveIdentifier")
 	proto.RegisterType((*VertexSlaveRegistry)(nil), "main.VertexSlaveRegistry")
 	proto.RegisterMapType((map[uint32]string)(nil), "main.VertexSlaveRegistry.RegistryEntry")
 	proto.RegisterType((*Empty)(nil), "main.Empty")
@@ -103,19 +183,24 @@ func init() {
 func init() { proto.RegisterFile("master_data.proto", fileDescriptor_ba343a99112eefe2) }
 
 var fileDescriptor_ba343a99112eefe2 = []byte{
-	// 189 bytes of a gzipped FileDescriptorProto
+	// 262 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xcc, 0x4d, 0x2c, 0x2e,
 	0x49, 0x2d, 0x8a, 0x4f, 0x49, 0x2c, 0x49, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0xc9,
-	0x4d, 0xcc, 0xcc, 0x53, 0x9a, 0xce, 0xc8, 0x25, 0x1c, 0x96, 0x5a, 0x54, 0x92, 0x5a, 0x11, 0x9c,
-	0x93, 0x58, 0x96, 0x1a, 0x94, 0x9a, 0x9e, 0x59, 0x5c, 0x52, 0x54, 0x29, 0xe4, 0xcc, 0xc5, 0x51,
-	0x04, 0x65, 0x4b, 0x30, 0x2a, 0x30, 0x6b, 0x70, 0x1b, 0xa9, 0xeb, 0x81, 0x34, 0xe8, 0x61, 0x51,
-	0xac, 0x07, 0x63, 0xb8, 0xe6, 0x95, 0x14, 0x55, 0x06, 0xc1, 0x35, 0x4a, 0x59, 0x73, 0xf1, 0xa2,
-	0x48, 0x09, 0x09, 0x70, 0x31, 0x67, 0xa7, 0x82, 0x0c, 0x64, 0xd4, 0xe0, 0x0d, 0x02, 0x31, 0x85,
-	0x44, 0xb8, 0x58, 0xcb, 0x12, 0x73, 0x4a, 0x53, 0x25, 0x98, 0x14, 0x18, 0x35, 0x38, 0x83, 0x20,
-	0x1c, 0x2b, 0x26, 0x0b, 0x46, 0x25, 0x76, 0x2e, 0x56, 0xd7, 0xdc, 0x82, 0x92, 0x4a, 0x23, 0x1f,
-	0x2e, 0x36, 0x5f, 0xb0, 0xeb, 0x85, 0x9c, 0xb8, 0xc4, 0xdc, 0x53, 0x4b, 0xb0, 0x39, 0x97, 0x1b,
-	0xe2, 0x38, 0xb0, 0x06, 0x29, 0x49, 0x9c, 0x2e, 0x55, 0x62, 0x48, 0x62, 0x03, 0xfb, 0xde, 0x18,
-	0x10, 0x00, 0x00, 0xff, 0xff, 0x2d, 0x5c, 0x2b, 0xca, 0x12, 0x01, 0x00, 0x00,
+	0x4d, 0xcc, 0xcc, 0x53, 0xd2, 0xe4, 0xe2, 0x0c, 0xce, 0x49, 0x2c, 0x4b, 0xf5, 0xc8, 0x2f, 0x2e,
+	0x11, 0x92, 0xe1, 0xe2, 0x2c, 0x86, 0x71, 0x24, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83, 0x10, 0x02,
+	0x4a, 0xd6, 0x5c, 0xfc, 0x60, 0xa5, 0x9e, 0x29, 0xa9, 0x79, 0x25, 0x99, 0x69, 0x99, 0xa9, 0x45,
+	0x42, 0x1a, 0x5c, 0xfc, 0xc5, 0xa8, 0x42, 0x60, 0x6d, 0xbc, 0x41, 0xe8, 0xc2, 0x4a, 0xd3, 0x19,
+	0xb9, 0x84, 0xc3, 0x52, 0x8b, 0x4a, 0x52, 0x2b, 0xc0, 0x66, 0x04, 0xa5, 0xa6, 0x67, 0x16, 0x97,
+	0x14, 0x55, 0x0a, 0x39, 0x73, 0x71, 0x14, 0x41, 0xd9, 0x12, 0x8c, 0x0a, 0xcc, 0x1a, 0xdc, 0x46,
+	0xea, 0x7a, 0x20, 0x87, 0xe9, 0x61, 0x51, 0xac, 0x07, 0x63, 0xb8, 0xe6, 0x95, 0x14, 0x55, 0x06,
+	0xc1, 0x35, 0x4a, 0x59, 0x73, 0xf1, 0xa2, 0x48, 0x09, 0x09, 0x70, 0x31, 0x67, 0xa7, 0x56, 0x42,
+	0xdd, 0x02, 0x62, 0x0a, 0x89, 0x70, 0xb1, 0x96, 0x25, 0xe6, 0x94, 0xa6, 0x4a, 0x30, 0x81, 0xbd,
+	0x05, 0xe1, 0x58, 0x31, 0x59, 0x30, 0x2a, 0xb1, 0x73, 0xb1, 0xba, 0xe6, 0x16, 0x94, 0x54, 0x1a,
+	0xb5, 0x33, 0x72, 0xb1, 0xf9, 0x82, 0x83, 0x49, 0xc8, 0x89, 0x4b, 0xcc, 0x3d, 0xb5, 0x04, 0x9b,
+	0x7b, 0xb9, 0x21, 0xae, 0x03, 0xeb, 0x90, 0x92, 0xc4, 0xe9, 0x54, 0x25, 0x06, 0x21, 0x4b, 0x98,
+	0xa3, 0x52, 0x8b, 0xc0, 0x52, 0x42, 0xfc, 0x10, 0xd5, 0xf0, 0xe0, 0x96, 0x12, 0x45, 0x12, 0x40,
+	0x0a, 0x2a, 0x86, 0x24, 0x36, 0x70, 0x0c, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x14, 0x7e,
+	0x30, 0x72, 0xb6, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -131,6 +216,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MasterClient interface {
 	GetVertexSlaveRegistry(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VertexSlaveRegistry, error)
+	RegisterSlave(ctx context.Context, in *SlaveHost, opts ...grpc.CallOption) (*SlaveIdentifier, error)
 }
 
 type masterClient struct {
@@ -150,9 +236,19 @@ func (c *masterClient) GetVertexSlaveRegistry(ctx context.Context, in *Empty, op
 	return out, nil
 }
 
+func (c *masterClient) RegisterSlave(ctx context.Context, in *SlaveHost, opts ...grpc.CallOption) (*SlaveIdentifier, error) {
+	out := new(SlaveIdentifier)
+	err := c.cc.Invoke(ctx, "/main.Master/RegisterSlave", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MasterServer is the server API for Master service.
 type MasterServer interface {
 	GetVertexSlaveRegistry(context.Context, *Empty) (*VertexSlaveRegistry, error)
+	RegisterSlave(context.Context, *SlaveHost) (*SlaveIdentifier, error)
 }
 
 // UnimplementedMasterServer can be embedded to have forward compatible implementations.
@@ -161,6 +257,9 @@ type UnimplementedMasterServer struct {
 
 func (*UnimplementedMasterServer) GetVertexSlaveRegistry(ctx context.Context, req *Empty) (*VertexSlaveRegistry, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVertexSlaveRegistry not implemented")
+}
+func (*UnimplementedMasterServer) RegisterSlave(ctx context.Context, req *SlaveHost) (*SlaveIdentifier, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterSlave not implemented")
 }
 
 func RegisterMasterServer(s *grpc.Server, srv MasterServer) {
@@ -185,6 +284,24 @@ func _Master_GetVertexSlaveRegistry_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Master_RegisterSlave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SlaveHost)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MasterServer).RegisterSlave(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/main.Master/RegisterSlave",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MasterServer).RegisterSlave(ctx, req.(*SlaveHost))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Master_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "main.Master",
 	HandlerType: (*MasterServer)(nil),
@@ -192,6 +309,10 @@ var _Master_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVertexSlaveRegistry",
 			Handler:    _Master_GetVertexSlaveRegistry_Handler,
+		},
+		{
+			MethodName: "RegisterSlave",
+			Handler:    _Master_RegisterSlave_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
