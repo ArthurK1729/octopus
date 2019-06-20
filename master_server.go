@@ -20,6 +20,7 @@ type masterserver struct {
 type SlaveClientInfo struct {
 	slaveHost             string
 	slaveClientConnection SlaveClient
+	done                  bool
 }
 
 func (s *masterserver) GetVertexSlaveRegistry(ctx context.Context, empty *Empty) (*VertexSlaveRegistry, error) {
@@ -32,6 +33,24 @@ func (s *masterserver) incrementSlaveCount() {
 	s.mut.Unlock()
 }
 
+func (s *masterserver) markSlaveAsDone(slaveID uint32) {
+	s.mut.Lock()
+	slaveClient := s.slaveConnectionStore[slaveID]
+	slaveClient.done = true
+	s.mut.Unlock()
+}
+
+func (s *masterserver) markSlavesAsNotDone() {
+	s.mut.Lock()
+
+	for slaveID := range s.slaveConnectionStore {
+		slaveClient := s.slaveConnectionStore[slaveID]
+		slaveClient.done = false
+	}
+
+	s.mut.Unlock()
+}
+
 func (s *masterserver) RegisterSlave(ctx context.Context, slaveHost *SlaveHost) (*SlaveIdentifier, error) {
 	log.Println("Registering slave", slaveHost.SlaveHost)
 	// Change localhost to proper hostname later
@@ -39,4 +58,11 @@ func (s *masterserver) RegisterSlave(ctx context.Context, slaveHost *SlaveHost) 
 	s.vertexSlaveRegistry.Registry[s.slaveCount] = "localhost:" + slaveHost.SlaveHost
 
 	return &SlaveIdentifier{SlaveIdentifier: s.slaveCount}, nil
+}
+
+func (s *masterserver) SlaveDone(ctx context.Context, slaveIdentifier *SlaveIdentifier) (*Empty, error) {
+	log.Println("Marking", slaveIdentifier.SlaveIdentifier, "as done.")
+	s.markSlaveAsDone(slaveIdentifier.SlaveIdentifier)
+
+	return &Empty{}, nil
 }

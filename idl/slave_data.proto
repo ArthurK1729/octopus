@@ -19,7 +19,7 @@ message Heartbeat {
 }
 
 message Envelopes {
-    repeated Envelope envelope = 1;
+    repeated Envelope envelopes = 1;
 }
 
 message Envelope {

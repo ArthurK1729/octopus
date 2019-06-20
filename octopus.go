@@ -11,8 +11,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-func slaveProcess(port string, masterHost string) {
-	slaveServer := &slaveserver{}
+func slaveProcess(port string, masterHost string, concurrencyLevel uint8) {
+	slaveServer := &slaveserver{
+		concurrencyLevel: concurrencyLevel,
+		inboxChannel:     make(chan Envelope, 100000),
+	}
+
 	var conn *grpc.ClientConn
 	var err error
 
@@ -30,10 +34,11 @@ func slaveProcess(port string, masterHost string) {
 	}
 	// Register with master
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	slaveServer.ctx = ctx
 	defer cancel()
 
-	masterClient := NewMasterClient(conn)
-	slaveIdentifier, err := masterClient.RegisterSlave(ctx, &SlaveHost{SlaveHost: port})
+	slaveServer.masterClient = NewMasterClient(conn)
+	slaveIdentifier, err := slaveServer.masterClient.RegisterSlave(ctx, &SlaveHost{SlaveHost: port})
 	if err != nil {
 		log.Fatal("Could not register with master")
 	}
@@ -95,8 +100,11 @@ func masterProcess(distributionFactor uint32) {
 		}
 		defer conn.Close()
 
-		masterServer.slaveConnectionStore[slaveID] = SlaveClientInfo{slaveHost: slaveHost,
-			slaveClientConnection: NewSlaveClient(conn)}
+		masterServer.slaveConnectionStore[slaveID] = SlaveClientInfo{
+			slaveHost:             slaveHost,
+			slaveClientConnection: NewSlaveClient(conn),
+			done:                  false,
+		}
 	}
 
 	log.Println("Done. Registered", masterServer.slaveCount, "slaves.")
@@ -143,14 +151,16 @@ func masterProcess(distributionFactor uint32) {
 	}
 	log.Println("Done splitting vertices by ID")
 
-	for slaveID, slave := range masterServer.slaveConnectionStore {
-		log.Println("Sending vertex shipment to", slave.slaveHost)
-		_, err := slave.slaveClientConnection.LoadGraphPartition(ctx, &Vertices{Vertices: vertexShipments[slaveID]})
+	for slaveID, slaveClient := range masterServer.slaveConnectionStore {
+		log.Println("Sending vertex shipment to", slaveClient.slaveHost)
+		_, err := slaveClient.slaveClientConnection.LoadGraphPartition(ctx, &Vertices{Vertices: vertexShipments[slaveID]})
 		if err != nil {
 			log.Fatalf("Could not load graph partition: %v", err)
 		}
 	}
 	log.Println("Done loading graph partitions into slaves")
+
+	// Send initial seed
 
 	// Superstep
 	for _, slave := range masterServer.slaveConnectionStore {
@@ -160,8 +170,6 @@ func masterProcess(distributionFactor uint32) {
 	time.Sleep(60 * time.Second)
 
 }
-
-var wg sync.WaitGroup
 
 // TODO:
 // Intelligent partitioning scheme. Don't load the whole graph into memory, rather
@@ -185,16 +193,18 @@ var wg sync.WaitGroup
 // Implement PopulateInbox
 // Refactor: create idl package
 // Refactor: create config package
+// Make OutboxWorker concurrent
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
+	concurrencyLevelPtr := flag.Uint("concurrencyLevel", 1, "number of go routines for slave workers")
 	masterHostPtr := flag.String("masterHost", "localhost:50051", "master node hostname")
 	distributionFactorPtr := flag.Uint("distributionFactor", 1, "number of slave nodes to expect")
 
 	log.Println(*modePtr)
 	flag.Parse()
 	if *modePtr == "slave" {
-		slaveProcess(*slavePortPtr, *masterHostPtr)
+		slaveProcess(*slavePortPtr, *masterHostPtr, uint8(*concurrencyLevelPtr))
 	} else if *modePtr == "master" {
 		masterProcess(uint32(*distributionFactorPtr))
 	}
