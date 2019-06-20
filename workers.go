@@ -34,3 +34,25 @@ func OutboxWorker(vertexStore map[uint32]*Vertex, outboxChannel chan Envelope, i
 
 	close(inboxChannel)
 }
+
+func (v *Vertex) Compute(message Message) {
+	if v.State.ShortestPathSize > message.CandidateShortestPath {
+		v.State.ShortestPathSize = message.CandidateShortestPath
+
+		// If a vertex has updated its state, it will want to broadcast it
+		v.VoteToHalt = false
+	}
+}
+
+func (v *Vertex) Broadcast(outboxChannel chan Envelope) {
+	log.Println("Broadcasting for", v.VertexID)
+
+	for _, nbdID := range v.OutNeighbourIds {
+		newState := v.State.ShortestPathSize + 1
+		outboxChannel <- Envelope{DestinationVertexID: nbdID, Message: &Message{CandidateShortestPath: newState}}
+
+		// As soon as the vertex has broadcasted its new state, it will want to stop
+		v.VoteToHalt = true
+	}
+
+}

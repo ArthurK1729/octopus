@@ -183,6 +183,8 @@ var wg sync.WaitGroup
 // VertexSlaveRegistry and SlaveClientInfo should be the same thing
 // Implement SlaveDone
 // Implement PopulateInbox
+// Refactor: create idl package
+// Refactor: create config package
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
