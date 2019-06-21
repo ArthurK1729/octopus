@@ -136,7 +136,7 @@ func (s *slaveserver) InitiateBroadcast(ctx context.Context, empty *Empty) (*Emp
 	for slaveID, envelopeShipment := range vertexShipments {
 		// If destination is inbound, just funnel the messages into own inbox
 		if slaveID == s.slaveIdentifier.SlaveIdentifier {
-			log.Println("Sending to myself:", envelopeShipment)
+			// log.Println("Sending to myself:", envelopeShipment)
 			s.populateOwnInbox(envelopeShipment)
 			continue
 		}
@@ -174,7 +174,6 @@ func (s *slaveserver) InboxWorker() {
 }
 
 func (s *slaveserver) BroadcastWorker() {
-	log.Println("Executing BroadcastWorker")
 	for _, v := range s.vertexStore {
 		if v.State.ShortestPathSize != math.MaxUint32 && v.VoteToHalt == false {
 			v.Broadcast(s.outboxChannel)
@@ -198,9 +197,8 @@ func (v *Vertex) Broadcast(outboxChannel chan Envelope) {
 		newState := v.State.ShortestPathSize + 1
 
 		outboxChannel <- Envelope{DestinationVertexID: nbdID, Message: &Message{CandidateShortestPath: newState}}
-
-		// As soon as the vertex has broadcasted its new state, it will want to stop
-		v.VoteToHalt = true
 	}
+	// As soon as the vertex has broadcasted its new state, it will want to stop
+	v.VoteToHalt = true
 
 }

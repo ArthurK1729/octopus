@@ -129,6 +129,7 @@ func masterProcess(distributionFactor uint32) {
 
 	log.Println("Ingesting vertices")
 	vertices, err := ReadAdjlist("data/facebook_social_graph.adjlist")
+	// vertices, err := ReadAdjlist("data/graph.adjlist")
 
 	if err != nil {
 		log.Fatalln("Couldn't read in graph. Exiting")
@@ -169,7 +170,7 @@ func masterProcess(distributionFactor uint32) {
 	log.Println("Seed message sent")
 
 	// Supersteps
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 10; i++ {
 		masterServer.markSlavesAsNotDone()
 
 		// Send InitiateExecution to every slave
@@ -255,7 +256,7 @@ func masterProcess(distributionFactor uint32) {
 // Refactor: create idl package
 // Refactor: create config package
 // Make OutboxWorker concurrent
-// voteToHalt doesn't seem to change
+// Still bugs in the propagation algorithm. 806 gets 8, but it should get 6. 750 is reachable theoretically, but octopus can't get there
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
