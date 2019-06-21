@@ -3,3 +3,8 @@ nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50053 &
 nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50054 &
 nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50055 &
 nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50056 &
+nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50057 &
+nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50058 &
+nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50059 &
+nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50060 &
+nohup ./octopus --mode=slave --concurrencyLevel=4 --slavePort=50061 &

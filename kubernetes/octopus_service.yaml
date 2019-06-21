@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: octopus-service
+spec:
+  type: ClusterIP
+  selector:
+    app: octopus
+  ports:
+    - protocol: TCP
+      port: 7687
+      targetPort: 7687
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: octopus
+spec:
+  serviceName: octopus-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: octopus
+  template:
+    metadata:
+      labels:
+        app: octopus
+    spec:
+      # volumes:
+      # - name: storage-name
+      #   persistentVolumeClaim:
+      #    claimName: pvc-name
+      containers:
+      - name: octopus
+        image: octopus:latest
+        imagePullPolicy: "Always"
+        volumeMounts:
+        - mountPath: "/data"
+          name: storage-name
+        ports:
+        - containerPort: 50051
+          name: master
