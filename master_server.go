@@ -11,8 +11,9 @@ const (
 )
 
 type masterserver struct {
-	vertexSlaveRegistry  VertexSlaveRegistry
-	slaveCount           uint32
+	vertexSlaveRegistry VertexSlaveRegistry
+	slaveCount          uint32
+	// Replace below with *SlaveClientInfo
 	slaveConnectionStore map[uint32]SlaveClientInfo
 	mut                  *sync.Mutex
 }
@@ -20,7 +21,7 @@ type masterserver struct {
 type SlaveClientInfo struct {
 	slaveHost             string
 	slaveClientConnection SlaveClient
-	done                  bool
+	done                  *bool
 }
 
 func (s *masterserver) GetVertexSlaveRegistry(ctx context.Context, empty *Empty) (*VertexSlaveRegistry, error) {
@@ -36,7 +37,7 @@ func (s *masterserver) incrementSlaveCount() {
 func (s *masterserver) markSlaveAsDone(slaveID uint32) {
 	s.mut.Lock()
 	slaveClient := s.slaveConnectionStore[slaveID]
-	slaveClient.done = true
+	*slaveClient.done = true
 	s.mut.Unlock()
 }
 
@@ -45,7 +46,7 @@ func (s *masterserver) markSlavesAsNotDone() {
 
 	for slaveID := range s.slaveConnectionStore {
 		slaveClient := s.slaveConnectionStore[slaveID]
-		slaveClient.done = false
+		*slaveClient.done = false
 	}
 
 	s.mut.Unlock()

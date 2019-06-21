@@ -1,4 +1,4 @@
 *.log
 *.out
 *.pb.go
-./octopus
+octopus

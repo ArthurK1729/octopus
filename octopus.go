@@ -100,10 +100,11 @@ func masterProcess(distributionFactor uint32) {
 		}
 		defer conn.Close()
 
+		var doneDefault = false
 		masterServer.slaveConnectionStore[slaveID] = SlaveClientInfo{
 			slaveHost:             slaveHost,
 			slaveClientConnection: NewSlaveClient(conn),
-			done:                  false,
+			done:                  &doneDefault,
 		}
 	}
 
@@ -161,11 +162,60 @@ func masterProcess(distributionFactor uint32) {
 	log.Println("Done loading graph partitions into slaves")
 
 	// Send initial seed
+	log.Println("Sending seed message")
+	seedMessage := &Envelope{DestinationVertexID: 0, Message: &Message{CandidateShortestPath: 0}}
+	slaveClient := masterServer.slaveConnectionStore[uint32(0+1)]
+	slaveClient.slaveClientConnection.PopulateInbox(ctx, &Envelopes{Envelopes: []*Envelope{seedMessage}})
+	log.Println("Seed message sent")
 
-	// Superstep
-	for _, slave := range masterServer.slaveConnectionStore {
-		slave.slaveClientConnection.InitiateExecution(ctx, &Empty{})
+	// Supersteps
+	for i := 0; i < 5; i++ {
+		masterServer.markSlavesAsNotDone()
+
+		// Send InitiateExecution to every slave
+		for _, slave := range masterServer.slaveConnectionStore {
+			slave.slaveClientConnection.InitiateExecution(ctx, &Empty{})
+		}
+
+		for {
+			log.Println("Checking on slaves...")
+			var doneAccumulator = true
+			for _, slaveClientInfo := range masterServer.slaveConnectionStore {
+				doneAccumulator = doneAccumulator && *slaveClientInfo.done
+			}
+
+			log.Println("ClientStore is", masterServer.slaveConnectionStore)
+
+			if doneAccumulator {
+				log.Println("All slaves are done")
+				break
+			}
+			log.Println("At least one slave is busy")
+			time.Sleep(5 * time.Second)
+		}
+
+		masterServer.markSlavesAsNotDone()
+
+		for _, slave := range masterServer.slaveConnectionStore {
+			slave.slaveClientConnection.InitiateBroadcast(ctx, &Empty{})
+		}
+
+		for {
+			log.Println("Checking on slaves...")
+			var doneAccumulator = true
+			for _, slaveClientInfo := range masterServer.slaveConnectionStore {
+				doneAccumulator = doneAccumulator && *slaveClientInfo.done
+			}
+
+			if doneAccumulator {
+				log.Println("All slaves are done")
+				break
+			}
+			log.Println("At least one slave is busy")
+			time.Sleep(5 * time.Second)
+		}
 	}
+	// Now collect result from slaves
 
 	time.Sleep(60 * time.Second)
 
@@ -194,6 +244,7 @@ func masterProcess(distributionFactor uint32) {
 // Refactor: create idl package
 // Refactor: create config package
 // Make OutboxWorker concurrent
+// In distributed mode, on some nodes, all states end up being 5. Investigate
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
