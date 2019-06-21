@@ -169,7 +169,7 @@ func masterProcess(distributionFactor uint32) {
 	log.Println("Seed message sent")
 
 	// Supersteps
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 6; i++ {
 		masterServer.markSlavesAsNotDone()
 
 		// Send InitiateExecution to every slave
@@ -217,7 +217,18 @@ func masterProcess(distributionFactor uint32) {
 	}
 	// Now collect result from slaves
 
-	time.Sleep(60 * time.Second)
+	log.Println("Collecting results from slaves")
+	for _, slaveClientInfo := range masterServer.slaveConnectionStore {
+		log.Println("Collecting results from", slaveClientInfo.slaveHost)
+		vertexShipment, err := slaveClientInfo.slaveClientConnection.CollectResults(ctx, &Empty{})
+		if err != nil {
+			log.Fatalln("Could not collect results from", slaveClientInfo.slaveHost)
+		}
+
+		WriteResultsToDisk(vertexShipment.Vertices, slaveClientInfo.slaveHost)
+	}
+
+	log.Println("Done")
 
 }
 
@@ -244,7 +255,7 @@ func masterProcess(distributionFactor uint32) {
 // Refactor: create idl package
 // Refactor: create config package
 // Make OutboxWorker concurrent
-// In distributed mode, on some nodes, all states end up being 5. Investigate
+// voteToHalt doesn't seem to change
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")

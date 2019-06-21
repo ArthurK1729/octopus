@@ -12,6 +12,7 @@ service Slave {
   rpc InitiateExecution(Empty) returns (Empty) {}
   rpc InitiateBroadcast(Empty) returns (Empty) {}
   rpc PopulateInbox(Envelopes) returns (Empty) {}
+  rpc CollectResults(Empty) returns (Vertices) {}
 }
 
 // Change below to timestamp

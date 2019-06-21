@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	fmt "fmt"
 	"io"
 	"log"
 	"math"
@@ -59,6 +60,17 @@ func ReadAdjlist(path string) (map[uint32]*Vertex, error) {
 	return vertexStore, nil
 }
 
-// func WriteResult(map[uint32]*Vertex) error {
+func WriteResultsToDisk(vertices []*Vertex, slaveHost string) {
+	log.Println("Writing results from", slaveHost)
+	file, err := os.Create(slaveHost + ".out")
+	if err != nil {
+		log.Fatalln("Could not create file for", slaveHost)
+	}
+	defer file.Close()
 
-// }
+	for _, vertex := range vertices {
+		file.WriteString(fmt.Sprintf("%v %v\n", vertex.VertexID, vertex.State.ShortestPathSize))
+	}
+
+	file.Sync()
+}

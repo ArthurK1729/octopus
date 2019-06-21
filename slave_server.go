@@ -26,6 +26,18 @@ func (s *slaveserver) GetHeartbeat(ctx context.Context, empty *Empty) (*Heartbea
 	return &Heartbeat{Timestamp: now}, nil
 }
 
+func (s *slaveserver) CollectResults(ctx context.Context, empty *Empty) (*Vertices, error) {
+	log.Println("Preparing results package")
+	vertexShipment := make([]*Vertex, 0)
+
+	for vertexID := range s.vertexStore {
+		vertexShipment = append(vertexShipment, s.vertexStore[vertexID])
+	}
+
+	log.Println("Done preparing results package. Sending back to master")
+	return &Vertices{Vertices: vertexShipment}, nil
+}
+
 func (s *slaveserver) PopulateInbox(ctx context.Context, envelopes *Envelopes) (*Empty, error) {
 	log.Println("Populating inbox with foreign messages")
 	for _, envelope := range envelopes.Envelopes {
@@ -121,7 +133,6 @@ func (s *slaveserver) InitiateBroadcast(ctx context.Context, empty *Empty) (*Emp
 	}
 
 	log.Println("Outbound messages sorted by slave ID")
-	log.Println("Vertex shipment:", vertexShipments)
 	for slaveID, envelopeShipment := range vertexShipments {
 		// If destination is inbound, just funnel the messages into own inbox
 		if slaveID == s.slaveIdentifier.SlaveIdentifier {
