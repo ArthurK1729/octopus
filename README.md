@@ -5,7 +5,7 @@
 `go build`
 
 # Create slaves
-`./octopus --mode=slave --masterHost=localhost:50051 --slavePort=50052`
+`./octopus --mode=slave --masterHost=localhost:50051 --slavePort=50052 --concurrencyLevel=4`
 
 # Create master
 `./octopus --mode=master --distributionFactor=2` 
