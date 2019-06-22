@@ -11,4 +11,4 @@ RUN go get -u github.com/golang/protobuf/protoc-gen-go
 RUN protoc --proto_path=idl --go_out=plugins=grpc:. idl/master_data.proto idl/slave_data.proto
 RUN go build
 
-CMD ["app", "--mode=master", "--distributionFactor=10"]
+ENTRYPOINT ["app"]

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: octopus-slave
+spec:
+  # serviceName: octopus-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: octopus
+  template:
+    metadata:
+      labels:
+        app: octopus
+    spec:
+      # volumes:
+      # - name: storage-name
+      #   persistentVolumeClaim:
+      #    claimName: pvc-name
+      containers:
+      - name: octopus
+        image: octopus:latest
+        args: ["--mode=slave", "--masterHost=octopus-service:50051", "--concurrencyLevel=5", "--slavePort=50052"]
+        imagePullPolicy: "Always"
+        # volumeMounts:
+        # - mountPath: "/data"
+        #   name: storage-name
+        ports:
+        - containerPort: 50052
+          name: slave

@@ -242,7 +242,6 @@ func masterProcess(distributionFactor uint32) {
 // https://www.youtube.com/watch?v=YEKjSzIwAdA try select default too?
 // Implement multi-algorithm message passing
 // Use a ring hash to distribute the vertices https://godoc.org/github.com/golang/groupcache/consistenthash
-// Collect resulting vertexStore from each slave. Append all results to a local file
 // Figure out how to make empty calls (remove &Empty{} throughout)
 // Add SlaveDelegate. Encapsulate all information for each slave (hostname, connection object, hash number) in a struct
 // Implement Brandes algorithm for betweenness https://www.cl.cam.ac.uk/teaching/1617/MLRD/handbook/brandes.pdf
@@ -251,12 +250,9 @@ func masterProcess(distributionFactor uint32) {
 // Create config file for all the timeouts and such
 // Why do vertexIDs start with 1 again?
 // VertexSlaveRegistry and SlaveClientInfo should be the same thing
-// Implement SlaveDone
-// Implement PopulateInbox
 // Refactor: create idl package
 // Refactor: create config package
-// Make OutboxWorker concurrent
-// Still bugs in the propagation algorithm. 806 gets 8, but it should get 6. 750 is reachable theoretically, but octopus can't get there
+// Make OutboxWorker concurrent§
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
