@@ -8,3 +8,5 @@ octopus
 *.so
 *.dylib
 *.test
+
+.idea
