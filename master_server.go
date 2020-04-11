@@ -56,7 +56,7 @@ func (s *masterserver) RegisterSlave(ctx context.Context, slaveHost *SlaveHost) 
 	log.Println("Registering slave", slaveHost.SlaveHost)
 	// Change localhost to proper hostname later
 	s.incrementSlaveCount()
-	s.vertexSlaveRegistry.Registry[s.slaveCount] = "octopus-service:" + slaveHost.SlaveHost
+	s.vertexSlaveRegistry.Registry[s.slaveCount] = "localhost:" + slaveHost.SlaveHost
 
 	return &SlaveIdentifier{SlaveIdentifier: s.slaveCount}, nil
 }

@@ -1,5 +1,7 @@
 # 🐙 Octopus 
-Octopus is a Hadoop-free Pregel-based distributed graph processing engine. It is meant to be an open source and off-the-shelf solution for companies wishing to derive features from their network-based data in a scalable way. All you have to do is supply a graph, select which features you want to derive using a command line argument, and presto: you have yourself a feature vector you can load into your favourite machine learning model 🚀
+Octopus is a Kubernetes-native Pregel-based distributed graph processing engine. It is meant to be an open source and off-the-shelf solution for data scientists and data engineers wishing to derive features from their network-based data in a scalable way. All you have to do is supply a graph, select which features you want to derive using a command line argument, and presto: you have yourself a feature vector you can load into your favourite machine learning model 🚀  
+
+This project implements this paper [this paper](https://kowshik.github.io/JPregel/pregel_paper.pdf).
 
 # Currently supported algorithms
 <ul>

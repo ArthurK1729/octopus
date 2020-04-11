@@ -258,7 +258,7 @@ func main() {
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
 	concurrencyLevelPtr := flag.Uint("concurrencyLevel", 1, "number of go routines for slave workers")
 	masterHostPtr := flag.String("masterHost", "localhost:50051", "master node hostname")
-	distributionFactorPtr := flag.Uint("distributionFactor", 1, "number of slave nodes to expect")
+	distributionFactorPtr := flag.Uint("distributionFactor", 10, "number of slave nodes to expect")
 
 	log.Println(*modePtr)
 	flag.Parse()

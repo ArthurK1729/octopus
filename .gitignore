@@ -10,3 +10,5 @@ octopus
 *.test
 
 .idea
+
+vendor
