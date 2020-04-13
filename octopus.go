@@ -253,6 +253,10 @@ func masterProcess(distributionFactor uint32) {
 // Refactor: create idl package
 // Refactor: create config package
 // Make OutboxWorker concurrent§
+// TODO: implement quorum mechanism. At the end of each superstep, do a vote for which node may have died
+// TODO: the node that has died must replay its messages, and the superstep finishes
+// TODO: implement mailbox snapshotting (some kind of WAL log for event processing?) Maybe just dump binary protobuf data to disk?
+// TODO: Can I do that using the generated clients?
 func main() {
 	modePtr := flag.String("mode", "master", "master or slave run mode")
 	slavePortPtr := flag.String("slavePort", "50052", "port for slave node")
